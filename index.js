@@ -1,5 +1,5 @@
 //Completed 3.1-3.7
-//Completed 3.9
+//Completed 3.9, 3.11
 
 const http = require('http')
 const express = require('express')
@@ -11,11 +11,11 @@ app.use(express.json())
 app.use(morgan('tiny'));
 
 //Part 3.9
-const cors = require('cors')
-app.use(cors())
+// const cors = require('cors')
+// app.use(cors())
 
-//3.11 frontend build
-//app.use(express.static('build'))
+//Part 3.11 frontend build
+app.use(express.static('build'))
 
 let contacts=[
   {
