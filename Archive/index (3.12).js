@@ -1,14 +1,11 @@
 //Completed 3.1-3.7
 //Completed 3.9-3.11
 //Completed 3.12 (mongo.js)
-//Completed 3.13-3.14
 //https://fso-part3-10.herokuapp.com/
 
 const http = require('http')
 const express = require('express')
 var morgan = require('morgan')
-const mongoose = require('mongoose')
-const Person = require("./models/person")
 
 const app = express()
 app.use(express.json());
@@ -54,15 +51,8 @@ app.get("/info",(req,res)=>{
   res.send("Phonebook has info for " + contacts.length +" people" + "<br/>" + date);
 })
 
-// app.get("/api/persons",(req,res)=>{
-//   res.send(contacts)
-// })
-
-// Part 3.13
 app.get("/api/persons",(req,res)=>{
-  Person.find({}).then(people => {
-    res.json(people)
-  })
+  res.send(contacts)
 })
 
 app.get("/api/persons/:postId",(req,res)=>{
@@ -85,31 +75,15 @@ app.post("/api/persons",(req,res)=>{
   const name = req.body.name;
   const number = req.body.number;
   let nameRepeat = contacts.find(element => element.name === name);
-
-  //Part 3.14
-  //contacts.push({name,number,"id":id}
-  const person = new Person({
-  name: name,
-  number: number
-  })
-
+  contacts.push({name,number,"id":id})
   if (nameRepeat){
     res.status(400).end('Name must be unique')
   }
-  else if (name=="" || number==""){
+  else if (!name || !number){
     res.status(400).end('Fields cannot be blank')
   }
-  else {
-    person.save().then(result => {
-      console.log("added " + person.name +" number" + person.number + "to phonebook")
-      mongoose.connection.close()
-    })
-  }
-
   console.log(req.body);
-  //Part 3.14
-  //res.send(contacts)
-
+  res.send(contacts)
 })
 
 const PORT = process.env.PORT || 3001
