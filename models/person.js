@@ -3,7 +3,7 @@
 
 const mongoose = require('mongoose')
 
-const url = "mongodb+srv://admin-benzsen:test123@cluster0.ml9kl.mongodb.net/part3phonebook?retryWrites=true&w=majority"
+const url = "mongodb+srv://admin-benzsen:"+"password"+"@cluster0.ml9kl.mongodb.net/part3phonebook?retryWrites=true&w=majority"
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 

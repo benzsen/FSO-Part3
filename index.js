@@ -97,7 +97,8 @@ app.delete("/api/persons/:id",(req,res,next)=>{
   //Part 3.15 mongoDB "_id" is not just numbers
   //const id = Number(req.params.id)
   const id = (req.params.id)
-  contacts = contacts.filter(element => element.id !== id)
+  //From Part 2
+  //contacts = contacts.filter(element => element.id !== id)
 
   Person.findByIdAndRemove(id)
     .then(result=>{
@@ -115,8 +116,11 @@ app.post("/api/persons",(req,res)=>{
 
   let nameRepeat = contacts.find(element => element.name === name);
 
+
+  //From Part 2
+  //contacts.push({name,number,"id":id})
+
   //Part 3.14
-  contacts.push({name,number,"id":id})
   const person = new Person({
   name: name,
   number: number
