@@ -2,6 +2,7 @@
 //Completed 3.9-3.11
 //Completed 3.12 (mongo.js)
 //Completed 3.13-3.14
+//Completed 3.15-3.18
 //https://fso-part3-10.herokuapp.com/
 
 const http = require('http')
@@ -10,7 +11,7 @@ var morgan = require('morgan')
 const mongoose = require('mongoose')
 const Person = require("./models/person")
 
-const app = express()
+const app = express();
 app.use(express.json());
 
 app.use(morgan('tiny'));
@@ -22,6 +23,22 @@ app.use(morgan('tiny'));
 //Part 3.11 frontend build
 app.use(express.static('build'))
 
+//Part 3.16
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+
+//May need to comment this out to truly tie to DB
+//Need to do duplicate checks on DB first
+//Need to add initial contacts here since data already in DB won't be updated here
 let contacts=[
   {
     "name": "Arto Hellas",
@@ -54,29 +71,40 @@ app.get("/info",(req,res)=>{
   res.send("Phonebook has info for " + contacts.length +" people" + "<br/>" + date);
 })
 
+// Part 3.13
 // app.get("/api/persons",(req,res)=>{
 //   res.send(contacts)
 // })
-
-// Part 3.13
 app.get("/api/persons",(req,res)=>{
   Person.find({}).then(people => {
     res.json(people)
   })
 })
 
-app.get("/api/persons/:postId",(req,res)=>{
-  const id = Number(req.params.postId)
-  let contactFound = contacts.find(element => element.id === id)
-  if (!contactFound){
-    res.status(404).end();
-  }
-  res.send(contactFound);
+app.get("/api/persons/:id",(req,res,next)=>{
+  const id = (req.params.id)
+  console.log(id);
+  Person.findById(id)
+    .then(result => {
+      console.log(result);
+      res.json(result)
+      res.status(204).end()
+    })
+    .catch(error => next())
 })
 
-app.delete("/api/persons/:postId",(req,res)=>{
-  const id = Number(req.params.postId)
+app.delete("/api/persons/:id",(req,res,next)=>{
+  //Part 3.15 mongoDB "_id" is not just numbers
+  //const id = Number(req.params.id)
+  const id = (req.params.id)
   contacts = contacts.filter(element => element.id !== id)
+
+  Person.findByIdAndRemove(id)
+    .then(result=>{
+      res.status(204).end()
+    })
+    .catch(error => next())
+
   res.status(204).end()
 })
 
@@ -84,10 +112,11 @@ app.post("/api/persons",(req,res)=>{
   const id = Math.floor(Math.random()*100);
   const name = req.body.name;
   const number = req.body.number;
+
   let nameRepeat = contacts.find(element => element.name === name);
 
   //Part 3.14
-  //contacts.push({name,number,"id":id}
+  contacts.push({name,number,"id":id})
   const person = new Person({
   name: name,
   number: number
@@ -108,8 +137,27 @@ app.post("/api/persons",(req,res)=>{
 
   console.log(req.body);
   //Part 3.14
-  //res.send(contacts)
+  //Need to keep for styling (Green Notif)
+  res.send(contacts)
+})
 
+
+app.put("/api/persons/:id",(req,res,next)=>{
+  const name = req.body.name;
+  const number = req.body.number;
+
+  const person = {
+    name: req.body.name,
+    number: req.body.number,
+  }
+
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch(error => next())
+
+  res.status(204).end()
 })
 
 const PORT = process.env.PORT || 3001

@@ -1,4 +1,5 @@
 //Part 3.13-3.14
+//Database config in one module
 
 const mongoose = require('mongoose')
 
