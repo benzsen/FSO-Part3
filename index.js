@@ -7,6 +7,8 @@
 
 const http = require('http')
 const express = require('express')
+
+//Part 3.7 Logging Middleware
 var morgan = require('morgan')
 const mongoose = require('mongoose')
 const Person = require("./models/person")
@@ -30,6 +32,9 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   }
+  else if (error.name === "ValidtionError") {
+    return response.status(400).send({ error: error.message })
+  }
 
   next(error)
 }
@@ -39,28 +44,32 @@ app.use(errorHandler)
 //May need to comment this out to truly tie to DB
 //Need to do duplicate checks on DB first
 //Need to add initial contacts here since data already in DB won't be updated here
-let contacts=[
-  {
-    "name": "Arto Hellas",
-    "number": "040-123456",
-    "id": 1
-  },
-  {
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523",
-    "id": 2
-  },
-  {
-    "name": "Dan Abramov",
-    "number": "12-43-234345",
-    "id": 3
-  },
-  {
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122",
-    "id": 4
-  }
-]
+// let contacts=[
+//   {
+//     "name": "Arto Hellas",
+//     "number": "040-123456",
+//     "id": 1
+//   },
+//   {
+//     "name": "Ada Lovelace",
+//     "number": "39-44-5323523",
+//     "id": 2
+//   },
+//   {
+//     "name": "Dan Abramov",
+//     "number": "12-43-234345",
+//     "id": 3
+//   },
+//   {
+//     "name": "Mary Poppendieck",
+//     "number": "39-23-6423122",
+//     "id": 4
+//   }
+// ]
+let contacts=[];
+Person.find({}).then(people => {
+  contacts=people;
+})
 
 app.get("/",(req,res)=>{
   res.send("build")
@@ -109,16 +118,13 @@ app.delete("/api/persons/:id",(req,res,next)=>{
   res.status(204).end()
 })
 
-app.post("/api/persons",(req,res)=>{
+app.post("/api/persons",(req,res,next)=>{
   const id = Math.floor(Math.random()*100);
   const name = req.body.name;
   const number = req.body.number;
+  //console.log(req.body);
 
   let nameRepeat = contacts.find(element => element.name === name);
-
-
-  //From Part 2
-  //contacts.push({name,number,"id":id})
 
   //Part 3.14
   const person = new Person({
@@ -133,15 +139,19 @@ app.post("/api/persons",(req,res)=>{
     res.status(400).end('Fields cannot be blank')
   }
   else {
-    person.save().then(result => {
+    person.save()
+      .then(result => {
       console.log("added " + person.name +" number" + person.number + "to phonebook")
       mongoose.connection.close()
-    })
+      })
+      .catch(error => next(error))
   }
 
-  console.log(req.body);
+  //From Part 2
+  //contacts.push({name,number,"id":id})
+
   //Part 3.14
-  //Need to keep for styling (Green Notif)
+  //Res to trigger front end styling (Green Notif)
   res.send(contacts)
 })
 
