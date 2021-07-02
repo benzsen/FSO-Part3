@@ -5,6 +5,7 @@
 //Completed 3.15-3.18
 //https://fso-part3-10.herokuapp.com/
 
+require('dotenv').config()
 const http = require('http')
 const express = require('express')
 
