@@ -12,12 +12,12 @@ const express = require('express')
 //Part 3.7 Logging Middleware
 var morgan = require('morgan')
 const mongoose = require('mongoose')
-const Person = require("./models/person")
+const Person = require('./models/person')
 
-const app = express();
-app.use(express.json());
+const app = express()
+app.use(express.json())
 
-app.use(morgan('tiny'));
+app.use(morgan('tiny'))
 
 //Part 3.9
 // const cors = require('cors')
@@ -33,7 +33,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   }
-  else if (error.name === "ValidtionError") {
+  else if (error.name === 'ValidtionError') {
     return response.status(400).send({ error: error.message })
   }
 
@@ -67,43 +67,43 @@ app.use(errorHandler)
 //     "id": 4
 //   }
 // ]
-let contacts=[];
+let contacts=[]
 Person.find({}).then(people => {
-  contacts=people;
+  contacts=people
 })
 
-app.get("/",(req,res)=>{
-  res.send("build")
+app.get('/',(req,res)=>{
+  res.send('build')
 })
 
-app.get("/info",(req,res)=>{
-  let date = new Date();
-  res.send("Phonebook has info for " + contacts.length +" people" + "<br/>" + date);
+app.get('/info',(req,res)=>{
+  let date = new Date()
+  res.send('Phonebook has info for ' + contacts.length +' people' + '<br/>' + date)
 })
 
 // Part 3.13
 // app.get("/api/persons",(req,res)=>{
 //   res.send(contacts)
 // })
-app.get("/api/persons",(req,res)=>{
+app.get('/api/persons',(req,res)=>{
   Person.find({}).then(people => {
     res.json(people)
   })
 })
 
-app.get("/api/persons/:id",(req,res,next)=>{
+app.get('/api/persons/:id',(req,res,next)=>{
   const id = (req.params.id)
-  console.log(id);
+  console.log(id)
   Person.findById(id)
     .then(result => {
-      console.log(result);
+      console.log(result)
       res.json(result)
       res.status(204).end()
     })
     .catch(error => next())
 })
 
-app.delete("/api/persons/:id",(req,res,next)=>{
+app.delete('/api/persons/:id',(req,res,next)=>{
   //Part 3.15 mongoDB "_id" is not just numbers
   //const id = Number(req.params.id)
   const id = (req.params.id)
@@ -119,31 +119,31 @@ app.delete("/api/persons/:id",(req,res,next)=>{
   res.status(204).end()
 })
 
-app.post("/api/persons",(req,res,next)=>{
-  const id = Math.floor(Math.random()*100);
-  const name = req.body.name;
-  const number = req.body.number;
-  //console.log(req.body);
+app.post('/api/persons',(req,res,next)=>{
+  const id = Math.floor(Math.random()*100)
+  const name = req.body.name
+  const number = req.body.number
+  //console.log(req.body)
 
-  let nameRepeat = contacts.find(element => element.name === name);
+  let nameRepeat = contacts.find(element => element.name === name)
 
   //Part 3.14
   const person = new Person({
-  name: name,
-  number: number
+    name: name,
+    number: number
   })
 
   if (nameRepeat){
     res.status(400).end('Name must be unique')
   }
-  else if (name=="" || number==""){
+  else if (name=='' || number==''){
     res.status(400).end('Fields cannot be blank')
   }
   else {
     person.save()
       .then(result => {
-      console.log("added " + person.name +" number" + person.number + "to phonebook")
-      mongoose.connection.close()
+        console.log('added ' + person.name +' number' + person.number + 'to phonebook')
+        mongoose.connection.close()
       })
       .catch(error => next(error))
   }
@@ -156,9 +156,9 @@ app.post("/api/persons",(req,res,next)=>{
   res.send(contacts)
 })
 
-app.put("/api/persons/:id",(req,res,next)=>{
-  const name = req.body.name;
-  const number = req.body.number;
+app.put('/api/persons/:id',(req,res,next)=>{
+  const name = req.body.name
+  const number = req.body.number
 
   const person = {
     name: req.body.name,

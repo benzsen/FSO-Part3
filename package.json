@@ -25,5 +25,9 @@
     "heroku": "^7.56.0",
     "mongoose": "^5.12.12",
     "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslist": "*"
   }
 }
