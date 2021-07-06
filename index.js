@@ -3,11 +3,13 @@
 //Completed 3.12 (mongo.js)
 //Completed 3.13-3.14
 //Completed 3.15-3.18
-//https://fso-part3-10.herokuapp.com/
+//https://fso-part3-complete.herokuapp.com/
 
 require('dotenv').config()
 const http = require('http')
 const express = require('express')
+const config = require('./utils/config')
+const logger = require('./utils/logger')
 
 //Part 3.7 Logging Middleware
 var morgan = require('morgan')
@@ -176,4 +178,4 @@ app.put('/api/persons/:id',(req,res,next)=>{
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+console.log(`Server running on port ${config.PORT}`)
